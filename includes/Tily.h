@@ -63,7 +63,7 @@ namespace ty
 		Map is a grid of chunks. It manages all the chunks so that we dont have
 		to worry about specific chunks or rendering them.
 	*/
-	class Map
+	class Map : public sf::Transformable
 	{
 	public:
 		Map();
@@ -74,9 +74,11 @@ namespace ty
 		void Set(sf::Uint32 x, sf::Uint32 y, sf::Uint8 layer, sf::Uint16 id);
 		int Get(sf::Uint32 x, sf::Uint32 y, sf::Uint8 layer);
 
-		void DrawLayer(sf::Uint8 layer, tgui::Canvas::Ptr target, sf::RenderStates rs);
+		void DrawLayer(sf::Uint8 layer, tgui::Canvas::Ptr target, sf::RenderStates rs) const;
 
-		void DrawLayer(sf::Uint8 layer, sf::RenderTarget & target, sf::RenderStates rs);
+		void DrawLayer(sf::Uint8 layer, sf::RenderTarget & target, sf::RenderStates rs) const;
+
+		
 
 	private:
 		Chunk*** m_chunks;
