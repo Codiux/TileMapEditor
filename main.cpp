@@ -1,4 +1,3 @@
-
 #include <TGUI/TGUI.hpp>
 #include <iostream>
 #include <vector>
@@ -6,10 +5,14 @@ using namespace std;
 
 #include "Tily.h"
 
+sf::Vector2f getRelativeCoords(sf::Vector2f position, sf::Vector2i mouse)
+{
+    return sf::Vector2f(mouse.x - position.x, mouse.y - position.y);
+}
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "Tile Map Editor");
+    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Tile Map Editor");
     window.setFramerateLimit(60);
 
     sf::Texture tileMap_t;
@@ -27,19 +30,26 @@ int main()
 
     int ID = 1;
 
+    map.setPosition(100, 100);
+
     ////////////////// TGUI ////////////////////
     tgui::Gui gui{window};
     
     auto canvas_window = tgui::ChildWindow::create();
-    canvas_window->setSize(400, 400);
+    canvas_window->setSize(800, 600);
     canvas_window->setPosition(50, 50);
     canvas_window->setResizable(true);
     gui.add(canvas_window);
 
     auto canvas_drawing = tgui::Canvas::create();
-    canvas_window->setSize(300, 300);
-    canvas_window->setPosition(0, 0);
+    canvas_drawing->setSize(canvas_window->getSize());
+    canvas_drawing->setPosition(0, 0);
     canvas_window->add(canvas_drawing);
+
+    //////// some variables //////
+    sf::Vector2i mouse = sf::Mouse::getPosition(window);
+
+    map.setPosition(50, 50);
 
     while(window.isOpen())
     {
@@ -48,28 +58,32 @@ int main()
         {
             if(event.type == sf::Event::Closed) window.close();
 
-            if(event.type == sf::Event::KeyPressed)
-            {
-                // do something..
-            }
+            if(event.type == sf::Event::MouseMoved) mouse = sf::Mouse::getPosition(window);
+
             gui.handleEvent(event);
         } 
-        cout << canvas_window->getChildWidgetsOffset().y << endl;
-
         // check for mouse presses
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-			sf::Vector2i mp = sf::Mouse::getPosition(window);
-			sf::Vector2f ap = window.mapPixelToCoords(mp);
-			map.Set(ap.x / ty::Settings::TileSize, ap.y / ty::Settings::TileSize, 0, ID);
-		}
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-            sf::Vector2f mouse = sf::Mouse::getPosition();
+        
+        if(canvas_drawing->mouseOnWidget(sf::Vector2f(mouse.x, mouse.y)))
+        {
+            sf::Vector2f canvas_drawing_position = canvas_window->getPosition() + canvas_window->getChildWidgetsOffset();
+            sf::Vector2f mouse_relative_to_canvas_window = getRelativeCoords(canvas_drawing_position, mouse);
 
-            sf::Vector2i ap = mouse - canvas_window->getPosition() - canvas_window->getWidgetOffset();
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+                sf::Vector2f mouse_relative_to_tile_map = getRelativeCoords(map.getPosition(), sf::Vector2i(mouse_relative_to_canvas_window.x, mouse_relative_to_canvas_window.y));
+                map.Set(mouse_relative_to_canvas_window.x / ty::Settings::TileSize, mouse_relative_to_canvas_window.y / ty::Settings::TileSize, 0, 2);
+            }
+            else if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                map.Set(mouse_relative_to_canvas_window.x / ty::Settings::TileSize, mouse_relative_to_canvas_window.y / ty::Settings::TileSize, 0, 1);
+            }
+            else if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)) {
+                map.setPosition(mouse_relative_to_canvas_window);
+            }
+        }
+        
 
-			map.Set(ap.x / ty::Settings::TileSize, ap.y / ty::Settings::TileSize, 0, 0);
-		}
-
+    
+    
 
         // draw graphics
         window.clear(sf::Color(60, 60, 60));
