@@ -32,6 +32,9 @@ int main()
 
     map.setPosition(100, 100);
 
+    sf::RectangleShape background(sf::Vector2f(500, 500));
+
+
     ////////////////// TGUI ////////////////////
     tgui::Gui gui{window};
     
@@ -85,13 +88,15 @@ int main()
     
     
 
-        // draw graphics
-        window.clear(sf::Color(60, 60, 60));
+        window.clear(sf::Color(60, 60, 60)); // clear the screen
 
-        map.DrawLayer(0, canvas_drawing, sf::RenderStates(&tileMap_t));
+        canvas_drawing->draw(background);
 
-        gui.draw();
-        window.display();
+        map.DrawLayer(0, canvas_drawing, sf::RenderStates(&tileMap_t)); // draw the tile map
+
+        gui.draw(); // draw gui like buttons
+
+        window.display(); // update the screen
     }
 
     return EXIT_SUCCESS;
