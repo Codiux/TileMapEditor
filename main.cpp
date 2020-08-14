@@ -1,9 +1,18 @@
 #include <TGUI/TGUI.hpp>
+#include <TGUI/Widgets/ChildWindow.hpp>
 #include <iostream>
 #include <vector>
 using namespace std;
 
-#include "Tily.h"
+#include "includes/Tily.h"
+
+tgui::ChildWindow::Ptr initTileMapPalette(sf::Texture& tileMap)
+{
+	auto window = tgui::ChildWindow::create();
+	auto tilePalette = tgui::Grid::create();
+
+	return window;
+}
 
 sf::Vector2f getRelativeCoords(sf::Vector2f position, sf::Vector2i mouse)
 {
