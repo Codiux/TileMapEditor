@@ -148,7 +148,7 @@ namespace ty
 
 		return m_chunks[layer][cy][cx].Get(x%Settings::ChunkWidth, y%Settings::ChunkHeight);
 	}
-	void Map::DrawLayer(sf::Uint8 z, tgui::Canvas::Ptr target, sf::RenderStates rs)
+	void Map::DrawLayer(sf::Uint8 z, tgui::Canvas::Ptr target, sf::RenderStates rs) const
 	{
 		sf::View view = target->getView();
 		sf::IntRect vr(view.getCenter().x - (view.getSize().x / 2), view.getCenter().y - (view.getSize().y / 2), view.getSize().x, view.getSize().y);
@@ -159,13 +159,15 @@ namespace ty
 		int csX = std::max(0, (vr.left / Settings::TileSize) / Settings::ChunkWidth);
 		int ceX = std::min((int)m_chunkHCount - 1, csX + 1 + ((vr.width / Settings::TileSize) / Settings::ChunkWidth));
 
+		rs.transform *= getTransform();
+
 		// render chunks
 		for (sf::Uint32 y = csY; y <= ceY; y++)
 			for (sf::Uint32 x = csX; x <= ceX; x++)
 				target->draw(m_chunks[z][y][x], rs);
 	}
 
-	void Map::DrawLayer(sf::Uint8 z, sf::RenderTarget & target, sf::RenderStates rs)
+	void Map::DrawLayer(sf::Uint8 z, sf::RenderTarget & target, sf::RenderStates rs) const
 	{
 		sf::View view = target.getView();
 		sf::IntRect vr(view.getCenter().x - (view.getSize().x / 2), view.getCenter().y - (view.getSize().y / 2), view.getSize().x, view.getSize().y);
@@ -175,6 +177,8 @@ namespace ty
 		int ceY = std::min((int)m_chunkVCount - 1, csY + 1 + ((vr.height / Settings::TileSize) / Settings::ChunkHeight));
 		int csX = std::max(0, (vr.left / Settings::TileSize) / Settings::ChunkWidth);
 		int ceX = std::min((int)m_chunkHCount - 1, csX + 1 + ((vr.width / Settings::TileSize) / Settings::ChunkWidth));
+
+		rs.transform *= getTransform();
 
 		// render chunks
 		for (sf::Uint32 y = csY; y <= ceY; y++)
